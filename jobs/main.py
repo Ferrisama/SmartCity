@@ -2,7 +2,8 @@ import os
 from confluent_kafka import SerializingProducer
 import simplejson as json
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
+import uuid
 
 KOLKATA_COORDINATES = {"latitude": 22.5744, "longitude": 88.3629}
 DELHI_COORDINATES = {"latitude": 28.7041, "longitude": 77.1025}
@@ -29,20 +30,46 @@ start_time = datetime.now()
 start_location = KOLKATA_COORDINATES.copy()
 
 
+def get_next_time():
+    global start_time
+    start_time += timedelta(seconds=random.randint(30, 60))
+    return start_time
+
+
 def simulate_vehicle_movement():
     global start_location
 
     start_location['latitude'] += LATITUDE_INCREMENT
     start_location['longitude'] += LONGITUDE_INCREMENT
 
+    start_location['latitude'] += random.uniform(-0.0005, 0.0005)
+    start_location['longitude'] += random.uniform(-0.0005, 0.0005)
+
+    return start_location
+
 
 def generate_vehicle_data(device_id):
     location = simulate_vehicle_movement()
+    return {
+        'id': uuid.uuid4(),
+        'deviceId': device_id,
+        'timestamp': get_next_time().isoformat(),
+        'location': (location['latitude'], location['longitude']),
+        'speed': random.uniform(10, 40),
+        'make': 'BMW',
+        'model': 'C500',
+        'year': 2024,
+        'fueltype': 'Hybrid'
+
+    }
 
 
 def simulate_journey(producer, device_id):
     while True:
         vehicle_data = generate_vehicle_data(device_id)
+        gps_data = generate_gps_data(device_id, vehicle_data['timestamp'])
+
+        break
 
 
 if __name__ == "__main__":
