@@ -10,3 +10,7 @@ def main():
         .config("spark.hadoop.fs.s3a.secret.key", configuration.get('AWS_SECRET_KEY'))\
         .config('spark.hadoop.fs.s3a.aws.credentials.provider', 'org.apache.hadoop.fs.s3a.impl.SimpleAWSCredentialsProvider')\
         .getOrCreate()
+
+
+if __name__ == "__main__":
+    main()
